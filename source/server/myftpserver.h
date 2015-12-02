@@ -18,7 +18,9 @@
 #include <netdb.h>
 #include <errno.h>
 #include <arpa/inet.h>
-#include <thread>
+#ifndef _WIN32
+#include <unistd.h>
+#endif
 
 #include "OptionParser.h"
 #include "worker.h"

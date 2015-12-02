@@ -86,8 +86,8 @@ int main(int argc, char * argv[]){
     server_t.ipv4addr = (unsigned int)inet_addr(options["ip"].c_str());
     server_log(SERVER_LOG_INFO, "Server IP parsed: %s Hex: %08x \n", options["ip"].c_str(), server_t.ipv4addr);
 
-    server_t.max_conns = (unsigned int)options.get("max-conns");
-    server_log(SERVER_LOG_INFO, "Server max connections: %d", server_t.max_conns);
+    server_t.max_conns = (unsigned int)options.get("max_conns");
+    server_log(SERVER_LOG_INFO, "Server max connections: %d\n", server_t.max_conns);
 
     start_server(&server_t);
 

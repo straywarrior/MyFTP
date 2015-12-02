@@ -1,3 +1,7 @@
+# CMake Generate
+Makefile
+CMakeCache.*
+build/*/CMakeFiles/
 # Compiled Object files
 *.slo
 *.lo

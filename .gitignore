@@ -30,3 +30,6 @@ build/*/CMakeFiles/
 *.exe
 *.out
 *.app
+
+# Temporary files
+.*.swp

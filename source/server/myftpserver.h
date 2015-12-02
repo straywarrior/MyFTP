@@ -21,7 +21,7 @@
 #include <thread>
 
 #include "OptionParser.h"
-#include "Worker.h"
+#include "worker.h"
 
 /*
  * Server Constants Definition

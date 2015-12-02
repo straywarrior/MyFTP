@@ -7,7 +7,11 @@ add_definitions('-g')
 add_definitions('-Wall')
 add_definitions('-std=c++11')
 
-set(SERVER_SRC_LIST server/${SERVER_NAME}.cpp)
+set(SERVER_SRC_LIST server/${SERVER_NAME}.cpp
+                    server/OptionParser.cpp
+                    server/Worker.cpp
+                    server/Connection.cpp
+                    )
 
 add_executable(${SERVER_NAME} ${SERVER_SRC_LIST})
 

@@ -18,30 +18,34 @@
 #include <netdb.h>
 #include <errno.h>
 #include <arpa/inet.h>
+#include <thread>
 
 #include "OptionParser.h"
 #include "Worker.h"
 
-#define DEFAULT_IPV4_ADDR INADDR_ANY    // Selected IP by System
-#define DEFAULT_PORT 21
-#define RETRY_TIME 1                    // Retry after 1 minutes.
-#define EOL "\r\n"
+/*
+ * Server Constants Definition
+ */
+
+#define DEFAULT_IPV4_ADDR   INADDR_ANY    // Selected IP by System
+#define DEFAULT_PORT        21
+#define RETRY_TIME          1             // Retry after 1 minutes.
+#define EOL                 "\r\n"
 
 /*
  * The config structure
- *
  */
 
 typedef struct myftpserver_t{
     unsigned int port;
     unsigned int ipv4addr;
+    unsigned int max_conns;
     //TODO: add ipv6 support?
 
 }myftpserver_t;
 
 /*
  * Define reply codes
- *
  */
 #define REPCODE_110 "110 Restart marker reply.\r\n"
 #define REPCODE_120 "120 Try again in " ## RETRY_TIME ##" minutes.\r\n"
@@ -98,5 +102,7 @@ typedef struct myftpserver_t{
 #define SERVER_LOG_INFO     3
 #define SERVER_LOG_DEBUG    4
 #define server_log(level, fmt...) fprintf(stderr, fmt)
+
+int start_server(myftpserver_t * server_t);
 
 #endif

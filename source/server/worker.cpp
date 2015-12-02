@@ -1,5 +1,5 @@
 /*
- * worker.cpp
+ * Worker.cpp
  * @Author:     StrayWarrior
  * @Date:       2015-12-02
  * @Email:      i@straywarrior.com
@@ -7,7 +7,7 @@
  *
  */
 
-#include "worker.h"
+#include "Worker.h"
 
 
 

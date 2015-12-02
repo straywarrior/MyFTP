@@ -1,5 +1,5 @@
 /*
- * worker.h
+ * Worker.h
  * @Author:     StrayWarrior
  * @Date:       2015-12-02
  * @Email:      i@straywarrior.com

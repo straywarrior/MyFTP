@@ -19,9 +19,12 @@
 #include <errno.h>
 #include <arpa/inet.h>
 
-#define DEFAULT_IPV4_ADDR INADDR_ANY
+#include "OptionParser.h"
+#include "Worker.h"
+
+#define DEFAULT_IPV4_ADDR INADDR_ANY    // Selected IP by System
 #define DEFAULT_PORT 21
-#define RETRY_TIME 1    // Retry after 1 minutes.
+#define RETRY_TIME 1                    // Retry after 1 minutes.
 #define EOL "\r\n"
 
 /*
@@ -32,6 +35,7 @@
 typedef struct myftpserver_t{
     unsigned int port;
     unsigned int ipv4addr;
+    //TODO: add ipv6 support?
 
 }myftpserver_t;
 
@@ -82,5 +86,17 @@ typedef struct myftpserver_t{
 #define REPCODE_551 "551 Requested action aborted: page type unknown.\r\n"
 #define REPCODE_552 "552 Requested file action aborted.\r\n"
 #define REPCODE_553 "553 Requested action not taken.\r\n"
+
+/*
+ * Log Definition
+ * FIXME: Real level needs to be added
+ * 原谅我ffmpeg和x264看得太多对此类日志系统中毒太深...
+ */
+#define SERVER_LOG_FATAL    0
+#define SERVER_LOG_ERROR    1
+#define SERVER_LOG_WARNING  2
+#define SERVER_LOG_INFO     3
+#define SERVER_LOG_DEBUG    4
+#define server_log(level, fmt...) fprintf(stderr, fmt)
 
 #endif

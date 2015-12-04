@@ -57,9 +57,9 @@ int start_server(myftpserver_t * server_t){
             server_log(SERVER_LOG_DEBUG, "Connection accepted.\n");
             // We are in Linux so use multi-process is really easy.
             // TODO: How to do it in Windows? Using thread?
-            myftpserver_worker_t worker_t;
-            worker_t.server = server_t;
-            worker_t.connection = connection;
+            myftpserver_worker_t * worker_t = new myftpserver_worker_t;
+            worker_t->server = server_t;
+            worker_t->connection = connection;
             pid_t pid = fork();
             if (pid < 0){
                 server_log(SERVER_LOG_FATAL, "Failed to create new process.\n");
@@ -69,11 +69,11 @@ int start_server(myftpserver_t * server_t){
             if (pid == 0){
                 // I'm child
                 server_log(SERVER_LOG_DEBUG, "New process created.\n");
-                worker_run(&worker_t);
+                worker_run(worker_t);
             }else{
                 // I'm father
                 conn_cnt++;
-                server_log(SERVER_LOG_INFO, "New connection established. Current connections: %d", conn_cnt);
+                server_log(SERVER_LOG_INFO, "New connection established. Current connections: %d\n", conn_cnt);
             }    
             
         }

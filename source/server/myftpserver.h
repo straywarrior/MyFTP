@@ -44,6 +44,9 @@
 #define EOL                 "\r\n"
 
 #define MAX_PATH_LEN        256           // Max length of working path
+#define MAX_READ_BUF        1024
+#define MAX_USER_NAME       32
+#define MAX_USER_PASS       32
 
 /*
  * The config structure

@@ -12,9 +12,24 @@
 
 /*
  * Protocol Interpreter
+ * Note: Need C++11
  */
+enum class FTPCMD{
+    // Access Control Commands
+    USER, PASS, ACCT, CWD, CDUP, SMNT, REIN, QUIT,
+    // Transfer Paramater Commands
+    PORT, PASV, TYPE, STRU, MODE, 
+    // FTP Service Commands
+    RETR, STOR, STOU, APPE, ALLO, REST, RNFR, RNTO,
+    ABOR, DELE, RMD, MKD, PWD, LIST, NLST, SITE,
+    SYST, STAT, HELP, NOOP,
+    // Unknown Commands
+    UNKNOWN, ERROR
+};
 
-
+FTPCMD read_command(int connection, char * arg_buf); 
+FTPCMD parse_command(char * read_buf, char * arg_buf);
+int split_arg(const char * cmd_buf, char * arg_bug);
 
 
 

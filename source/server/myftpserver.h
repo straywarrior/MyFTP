@@ -17,6 +17,7 @@
 #include <netdb.h>
 #include <errno.h>
 #include <arpa/inet.h>
+#include <string.h>
 #ifndef _WIN32
 #include <sys/types.h>
 #include <sys/fcntl.h>

@@ -9,6 +9,7 @@
 
 #include "myftpserver.h"
 #include "OptionParser.h"
+#include "worker.h"
 
 using optparse::OptionParser;
 
@@ -16,6 +17,7 @@ int start_server(myftpserver_t * server_t){
     // Create a socket
     int server_sock;
     struct sockaddr_in server_sock_addr;
+    int conn_cnt = 0;
     
     if ((server_sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0){
         server_log(SERVER_LOG_FATAL, "Failed to create socket. Exit.\n");
@@ -50,9 +52,29 @@ int start_server(myftpserver_t * server_t){
     while (true){
         if ((connection = accept(server_sock, (struct sockaddr *) &server_sock_addr, &server_sock_addrlen)) < 0){
             server_log(SERVER_LOG_ERROR, "Failed to accept connection. \n");
-            return (-1);
+            break;
         }else{
             server_log(SERVER_LOG_DEBUG, "Connection accepted.\n");
+            // We are in Linux so use multi-process is really easy.
+            // TODO: How to do it in Windows? Using thread?
+            myftpserver_worker_t worker_t;
+            worker_t.server = server_t;
+            worker_t.connection = connection;
+            pid_t pid = fork();
+            if (pid < 0){
+                server_log(SERVER_LOG_FATAL, "Failed to create new process.\n");
+                close(connection);
+                break;
+            }
+            if (pid == 0){
+                // I'm child
+                server_log(SERVER_LOG_DEBUG, "New process created.\n");
+                worker_run(&worker_t);
+            }else{
+                // I'm father
+                conn_cnt++;
+                server_log(SERVER_LOG_INFO, "New connection established. Current connections: %d", conn_cnt);
+            }    
             
         }
 

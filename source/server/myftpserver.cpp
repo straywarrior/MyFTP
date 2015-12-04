@@ -8,6 +8,7 @@
  */
 
 #include "myftpserver.h"
+#include "OptionParser.h"
 
 using optparse::OptionParser;
 

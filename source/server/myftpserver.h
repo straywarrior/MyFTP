@@ -7,23 +7,32 @@
  *
  */
 
-#ifndef _MYFTP_SERVER_H
-#define _MYFTP_SERVER_H value
+#ifndef _MYFTP_SERVER_H_
+#define _MYFTP_SERVER_H_ value
 
+/*
+ * Standard C header
+ */
 #include <stdio.h>
-#include <sys/types.h>
-#include <sys/fcntl.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
 #include <netdb.h>
 #include <errno.h>
 #include <arpa/inet.h>
 #ifndef _WIN32
+#include <sys/types.h>
+#include <sys/fcntl.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
 #include <unistd.h>
 #endif
 
-#include "OptionParser.h"
-#include "worker.h"
+/*
+ * C++ STL header
+ * C++ 11 is needed
+ */
+
+/*
+ * My header
+ */
 
 /*
  * Server Constants Definition
@@ -34,10 +43,11 @@
 #define RETRY_TIME          1             // Retry after 1 minutes.
 #define EOL                 "\r\n"
 
+#define MAX_PATH_LEN        256
+
 /*
  * The config structure
  */
-
 typedef struct myftpserver_t{
     unsigned int port;
     unsigned int ipv4addr;

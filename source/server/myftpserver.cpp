@@ -26,7 +26,7 @@ int start_server(myftpserver_t * server_t){
 
     // Bind a socket
     server_sock_addr.sin_family = AF_INET;
-    server_sock_addr.sin_port = server_t->port;
+    server_sock_addr.sin_port = htons(server_t->port);
     server_sock_addr.sin_addr.s_addr = server_t->ipv4addr;
     unsigned int server_sock_addrlen = sizeof(server_sock_addr);
 

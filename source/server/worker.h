@@ -12,8 +12,14 @@
 
 #include "myftpserver.h"
 
-int worker_run(int connection, struct myftpserver_t * server_t);
+typedef struct myftpserver_worker_t{
+    myftpserver_t * server;
+    int connection;
+    char rootdir[MAX_PATH_LEN];     // Root dir. User cannot escape out of the dir!!
+    char rela_path[MAX_PATH_LEN];   // Relative path to rootdir
+}myftpserver_worker_t;
 
-int send_reply(int connection, const char * send_buf, int len);
+int worker_run(myftpserver_worker_t * worker_t);
+
 
 #endif /* !_MYFTP_WORKER_H_ */

@@ -11,7 +11,7 @@
 #define _MYFTP_SERVER_H_ value
 
 /*
- * Standard C header
+ * C header
  */
 #include <stdio.h>
 #include <netdb.h>
@@ -38,13 +38,12 @@
 /*
  * Server Constants Definition
  */
-
 #define DEFAULT_IPV4_ADDR   INADDR_ANY    // Selected IP by System
 #define DEFAULT_PORT        21
 #define RETRY_TIME          1             // Retry after 1 minutes.
 #define EOL                 "\r\n"
 
-#define MAX_PATH_LEN        256
+#define MAX_PATH_LEN        256           // Max length of working path
 
 /*
  * The config structure
@@ -116,6 +115,9 @@ typedef struct myftpserver_t{
 #define SERVER_LOG_DEBUG    4
 #define server_log(level, fmt...) fprintf(stderr, fmt)
 
+/*
+ * Main Functions Definition
+ */
 int start_server(myftpserver_t * server_t);
 
 #endif

@@ -9,8 +9,8 @@ add_definitions('-std=c++11')
 
 set(SERVER_SRC_LIST server/${SERVER_NAME}.cpp
                     server/worker.cpp
+                    server/connection.cpp
                     server/OptionParser.cpp
-                    server/Connection.cpp
                     )
 
 add_executable(${SERVER_NAME} ${SERVER_SRC_LIST})

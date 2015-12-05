@@ -69,15 +69,16 @@ int start_server(myftpserver_t * server_t){
             if (pid == 0){
                 // I'm child
                 server_log(SERVER_LOG_DEBUG, "New process created.\n");
+                // FIXME: Memory leak here.
                 worker_run(worker_t);
+                close(connection);
+                exit(0);
             }else{
                 // I'm father
                 conn_cnt++;
                 server_log(SERVER_LOG_INFO, "New connection established. Current connections: %d\n", conn_cnt);
             }    
-            
         }
-
     }
 
     close(server_sock);

@@ -20,12 +20,14 @@ int worker_run(myftpserver_worker_t * worker_t) {
 
     // TODO: Read username and user-dir from config dir
     
-    while(true){
+    bool conn_close = false;
+    while(!conn_close){
         char arg_buf[MAX_READ_BUF + 1] = {0};
         FTPCMD cur_cmd = read_command(conn_handle, arg_buf);
         server_log(SERVER_LOG_DEBUG, "Command %d from connection %d.\n", static_cast<int>(cur_cmd), conn_handle);;
         switch (cur_cmd){
             case FTPCMD::ERROR:
+                conn_close = true;
                 break;
             default:
                 break;

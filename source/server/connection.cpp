@@ -53,55 +53,55 @@ FTPCMD parse_command(char * read_buf, char * arg_buf){
         *c = (char)(toupper(*c));
     }
     int cmd_len = c - read_buf;
-    server_log(SERVER_LOG_DEBUG, "Space found. Command length: %d", cmd_len);
+    server_log(SERVER_LOG_DEBUG, "Space found. Command length: %d\n", cmd_len);
     if (cmd_len < 3 || cmd_len > 4){
         server_log(SERVER_LOG_WARNING, "Invalid command.\n");
         return FTPCMD::UNKNOWN;
     }
     split_arg(c, arg_buf);
     if (cmd_len == 3){
-        if (strncmp(read_buf, "PWD", 3) == 0){
+        if (strncasecmp(read_buf, "PWD", 3) == 0){
             return FTPCMD::PWD;
         }
     }
     if (cmd_len == 4){
-        if (strncmp(read_buf, "USER", 4) == 0){
+        if (strncasecmp(read_buf, "USER", 4) == 0){
             return FTPCMD::USER;
         }
-        if (strncmp(read_buf, "PASS", 4) == 0){
+        if (strncasecmp(read_buf, "PASS", 4) == 0){
             return FTPCMD::PASS;
         }
-        if (strncmp(read_buf, "QUIT", 4) == 0){
+        if (strncasecmp(read_buf, "QUIT", 4) == 0){
             return FTPCMD::QUIT;
         }
-        if (strncmp(read_buf, "PORT", 4) == 0){
+        if (strncasecmp(read_buf, "PORT", 4) == 0){
             return FTPCMD::PORT;
         }
-        if (strncmp(read_buf, "TYPE", 4) == 0){
+        if (strncasecmp(read_buf, "TYPE", 4) == 0){
             return FTPCMD::TYPE;
         }
-        if (strncmp(read_buf, "MODE", 4) == 0){
+        if (strncasecmp(read_buf, "MODE", 4) == 0){
             return FTPCMD::MODE;
         }
-        if (strncmp(read_buf, "STRU", 4) == 0){
+        if (strncasecmp(read_buf, "STRU", 4) == 0){
             return FTPCMD::STRU;
         }
-        if (strncmp(read_buf, "RETR", 4) == 0){
+        if (strncasecmp(read_buf, "RETR", 4) == 0){
             return FTPCMD::RETR;
         }
-        if (strncmp(read_buf, "STOR", 4) == 0){
+        if (strncasecmp(read_buf, "STOR", 4) == 0){
             return FTPCMD::STOR;
         }
-        if (strncmp(read_buf, "NOOP", 4) == 0){
+        if (strncasecmp(read_buf, "NOOP", 4) == 0){
             return FTPCMD::NOOP;
         }
-        if (strncmp(read_buf, "LIST", 4) == 0){
+        if (strncasecmp(read_buf, "LIST", 4) == 0){
             return FTPCMD::LIST;
         }
-        if (strncmp(read_buf, "NLST", 4) == 0){
+        if (strncasecmp(read_buf, "NLST", 4) == 0){
             return FTPCMD::NLST;
         }
-        if (strncmp(read_buf, "HELP", 4) == 0){
+        if (strncasecmp(read_buf, "HELP", 4) == 0){
             return FTPCMD::HELP;
         }
     }

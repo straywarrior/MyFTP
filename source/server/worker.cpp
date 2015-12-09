@@ -29,7 +29,21 @@ int worker_run(myftpserver_worker_t * worker_t) {
             case FTPCMD::ERROR:
                 conn_close = true;
                 break;
+            case FTPCMD::USER:
+                if (arg_buf == nullptr || strlen(arg_buf) == 0){
+                    send_reply(conn_handle, REPCODE_501, strlen(REPCODE_501));
+                    break;
+                }
+                if (strcmp(arg_buf, "anonymous") == 0){
+                    // Not in RFC 959. Suggested by RFC 1635
+                }
+                strcpy(worker_t->username, arg_buf);
+                send_reply(conn_handle, REPCODE_331, strlen(REPCODE_331));
+
+
+                break;
             default:
+                conn_close = true;
                 break;
         }
 

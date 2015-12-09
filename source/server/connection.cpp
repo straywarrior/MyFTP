@@ -51,7 +51,6 @@ FTPCMD parse_command(char * read_buf, char * arg_buf){
     for (; *c != '\0' && *c != ' '; c++){
         //FIXME: Core Dump Here.
         *c = (char)(toupper(*c));
-        server_log(SERVER_LOG_DEBUG, "Parsing...\n");
     }
     int cmd_len = c - read_buf;
     server_log(SERVER_LOG_DEBUG, "Space found. Command length: %d", cmd_len);

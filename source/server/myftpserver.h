@@ -56,7 +56,7 @@ typedef struct myftpserver_t{
     unsigned int ipv4addr;
     unsigned int max_conns;
     //TODO: add ipv6 support?
-
+    bool allow_anonymous;
 }myftpserver_t;
 
 /*

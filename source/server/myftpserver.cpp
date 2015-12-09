@@ -10,14 +10,17 @@
 #include "myftpserver.h"
 #include "OptionParser.h"
 #include "worker.h"
+#include <map>
 
 using optparse::OptionParser;
+
 
 int start_server(myftpserver_t * server_t){
     // Create a socket
     int server_sock;
     struct sockaddr_in server_sock_addr;
     int conn_cnt = 0;
+    std::map<pid_t, myftpserver_worker_t *> worker_map;
     
     if ((server_sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0){
         server_log(SERVER_LOG_FATAL, "Failed to create socket. Exit.\n");
@@ -98,6 +101,8 @@ int main(int argc, char * argv[]){
         .help("Set listening IP. Default: 127.0.0.1");
     parser.add_option("-m", "--max-conns").dest("max_conns").type("int").set_default("10")
         .help("Set max connections limit. Default: 10");
+    parser.add_option("-a", "--allow-anonymous").dest("allow_anony").type("int").set_default("0")
+        .help("Allow anonymous connections. Default: 0");
     parser.add_help_option();
 
     optparse::Values & options = parser.parse_args(argc, argv);
@@ -112,6 +117,9 @@ int main(int argc, char * argv[]){
 
     server_t.max_conns = (unsigned int)options.get("max_conns");
     server_log(SERVER_LOG_INFO, "Server max connections: %d\n", server_t.max_conns);
+
+    server_t.allow_anonymous = (bool)options.get("allow_anony");
+    server_log(SERVER_LOG_INFO, "Server allows anonymous connections: %d", server_t.allow_anonymous);
 
     start_server(&server_t);
 

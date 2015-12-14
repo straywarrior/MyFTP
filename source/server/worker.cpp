@@ -70,7 +70,9 @@ int worker_run(myftpserver_worker_t * worker_t) {
         server_log(SERVER_LOG_DEBUG, "Command %d from connection %d.\n", static_cast<int>(cur_cmd), conn_handle);;
 
         if (cur_cmd == FTPCMD::ERROR || cur_cmd == FTPCMD::QUIT){
+            send_reply(conn_handle, REPCODE_221, strlen(REPCODE_221));
             conn_close = true;
+            continue;
         }
         if (cur_cmd == FTPCMD::UNKNOWN){
             send_reply(conn_handle, REPCODE_503, strlen(REPCODE_503));

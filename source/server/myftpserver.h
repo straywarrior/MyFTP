@@ -71,7 +71,7 @@ typedef struct myftpserver_t{
 
 #define REPCODE_200 "200 Command okay.\r\n"
 #define REPCODE_202 "202 Command not implemented, superfluous at this site.\r\n"
-#define REPCODE_211 "221 System status, or system help reply.\r\n"
+#define REPCODE_211 "211 System status, or system help reply.\r\n"
 #define REPCODE_212 "212 Directory status.\r\n"
 #define REPCODE_213 "213 File status.\r\n"
 #define REPCODE_214 "214 Help message.\r\n"

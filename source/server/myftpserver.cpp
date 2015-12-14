@@ -75,6 +75,7 @@ int start_server(myftpserver_t * server_t){
                 // FIXME: Memory leak here.
                 worker_run(worker_t);
                 close(connection);
+                server_log(SERVER_LOG_INFO, "Connection %d closed.\n", connection);
                 exit(0);
             }else{
                 // I'm father
@@ -125,7 +126,7 @@ int main(int argc, char * argv[]){
     server_t.allow_anonymous = (bool)options.get("allow_anony");
     server_log(SERVER_LOG_INFO, "Server allows anonymous connections: %d\n", server_t.allow_anonymous);
 
-    strcpy(server_t.default_dir, options["config"].c_str());
+    strcpy(server_t.default_dir, options["default_dir"].c_str());
     server_log(SERVER_LOG_INFO, "Server default dir: %s\n", server_t.default_dir);
 
     start_server(&server_t);

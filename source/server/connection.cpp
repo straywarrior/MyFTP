@@ -21,22 +21,18 @@
  */
 FTPCMD read_command(int connection, char * arg_buf){
     char read_buf[MAX_READ_BUF + 1] = {0};
-    //char * read_buf = new char [MAX_READ_BUF + 1];
     int recv_len = recv(connection, &read_buf, MAX_READ_BUF, 0);
     if (recv_len <= 0){
         server_log(SERVER_LOG_WARNING, "Failed to receive from client. Terminating...\n");
-    //    delete read_buf;
         return FTPCMD::ERROR;
     }
     if (recv_len < 3){
         server_log(SERVER_LOG_WARNING, "Failed to read command from client...\n");
-    //    delete read_buf;
         return FTPCMD::UNKNOWN;
     }
     read_buf[recv_len] = '\0';
-    server_log(SERVER_LOG_DEBUG, "Read from client... Done. Parse it.\n");
+    server_log(SERVER_LOG_DEBUG, "Read %d bytes from client: %s.\n", recv_len, read_buf);
     FTPCMD result = parse_command(read_buf, arg_buf);
-    //delete read_buf;
     return result;
 }
 
@@ -46,10 +42,8 @@ FTPCMD parse_command(char * read_buf, char * arg_buf){
         return FTPCMD::ERROR;
     }
     // Find the first space and convert command character to UPPERCASE
-    server_log(SERVER_LOG_DEBUG, "Parsing start.\n");
     char * c = read_buf;
-    for (; *c != '\0' && *c != ' '; c++){
-        //FIXME: Core Dump Here.
+    for (; *c != '\0' && *c != ' ' && *c != '\r' && *c != '\n'; c++){
         *c = (char)(toupper(*c));
     }
     int cmd_len = c - read_buf;

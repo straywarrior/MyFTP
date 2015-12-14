@@ -103,6 +103,10 @@ int main(int argc, char * argv[]){
         .help("Set max connections limit. Default: 10");
     parser.add_option("-a", "--allow-anonymous").dest("allow_anony").type("int").set_default("0")
         .help("Allow anonymous connections. Default: 0");
+    parser.add_option("-d", "--default-dir").dest("default_dir").set_default("")
+        .help("Default dir for anonymous users");
+    parser.add_option("-c", "--config").dest("config_file").set_default("")
+        .help("Configuration file");
     parser.add_help_option();
 
     optparse::Values & options = parser.parse_args(argc, argv);
@@ -119,7 +123,10 @@ int main(int argc, char * argv[]){
     server_log(SERVER_LOG_INFO, "Server max connections: %d\n", server_t.max_conns);
 
     server_t.allow_anonymous = (bool)options.get("allow_anony");
-    server_log(SERVER_LOG_INFO, "Server allows anonymous connections: %d", server_t.allow_anonymous);
+    server_log(SERVER_LOG_INFO, "Server allows anonymous connections: %d\n", server_t.allow_anonymous);
+
+    strcpy(server_t.default_dir, options["config"].c_str());
+    server_log(SERVER_LOG_INFO, "Server default dir: %s\n", server_t.default_dir);
 
     start_server(&server_t);
 

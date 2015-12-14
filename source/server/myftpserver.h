@@ -14,6 +14,7 @@
  * C header
  */
 #include <stdio.h>
+#include <stdlib.h>
 #include <netdb.h>
 #include <errno.h>
 #include <arpa/inet.h>
@@ -57,6 +58,7 @@ typedef struct myftpserver_t{
     unsigned int max_conns;
     //TODO: add ipv6 support?
     bool allow_anonymous;
+    char default_dir[MAX_PATH_LEN];
 }myftpserver_t;
 
 /*

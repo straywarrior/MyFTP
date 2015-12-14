@@ -10,6 +10,7 @@ add_definitions('-std=c++11')
 set(SERVER_SRC_LIST server/${SERVER_NAME}.cpp
                     server/worker.cpp
                     server/connection.cpp
+                    server/fileoperation.cpp
                     server/OptionParser.cpp
                     )
 

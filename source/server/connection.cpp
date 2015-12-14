@@ -86,6 +86,9 @@ FTPCMD parse_command(char * read_buf, char * arg_buf){
         if (strncasecmp(read_buf, "STOR", 4) == 0){
             return FTPCMD::STOR;
         }
+        if (strncasecmp(read_buf, "SYST", 4) == 0){
+            return FTPCMD::SYST;
+        }
         if (strncasecmp(read_buf, "NOOP", 4) == 0){
             return FTPCMD::NOOP;
         }

@@ -49,6 +49,12 @@ static int get_data_conn_parm(char * arg_buf, unsigned int * data_v4addr, unsign
     return 0;
 }
 
+static void get_system_str(char * buf){
+#ifdef __linux__
+    strcpy(buf, "LINUX\r\n");
+#endif
+}
+
 myftpserver_worker_t::~myftpserver_worker_t(){
     this->server = nullptr;    
 }
@@ -137,7 +143,12 @@ int worker_run(myftpserver_worker_t * worker_t) {
                     break;
                 case FTPCMD::NOOP:
                     break;
-
+                case FTPCMD::SYST:
+                    // Sent by FTP built-in Linux
+                    char buf[10];
+                    get_system_str(buf);
+                    send_reply(conn_handle, buf, strlen(buf));
+                    break;
                 default:
                     break;
             }

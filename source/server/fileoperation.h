@@ -16,10 +16,9 @@
 #include <dirent.h>
 #include <sys/stat.h>
 
-int init_working_dir(myftpserver_worker_t * worker_t);
 int change_dir(myftpserver_worker_t * worker_t, const char * pathname);
 int get_cur_path(myftpserver_worker_t * worker_t, char * result);
+int get_absolute_path(myftpserver_worker_t * worker_t, char * result);
 int list_dir(myftpserver_worker_t * worker_t);
-int close_working_dir(myftpserver_worker_t * worker_t);
 
 #endif /* !_FILEOPERATION_H_ */

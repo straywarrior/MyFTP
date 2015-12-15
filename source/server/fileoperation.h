@@ -14,6 +14,7 @@
 #include "worker.h"
 #include <fcntl.h>
 #include <dirent.h>
+#include <sys/stat.h>
 
 int init_working_dir(myftpserver_worker_t * worker_t);
 int change_dir(myftpserver_worker_t * worker_t, const char * pathname);

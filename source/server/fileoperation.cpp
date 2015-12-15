@@ -94,6 +94,13 @@ int list_dir(myftpserver_worker_t * worker_t){
     char cur_path[MAX_PATH_LEN];
     get_absolute_path(worker_t, cur_path);
     DIR * dir = open_dir(cur_path); 
+    if (!dir){
+        send_reply(worker_t->connection, REPCODE_450, strlen(REPCODE_450));
+        closedir(dir);
+        return -1;
+    }
+
+    send_reply(worker_t->connection, REPCODE_150, strlen(REPCODE_150));
     
     char fileinfo[MAX_PATH_LEN * 2];
     while (true){
@@ -102,6 +109,7 @@ int list_dir(myftpserver_worker_t * worker_t){
             break;
         if (get_fileinfo(cur_dirent->d_name, fileinfo) != 0){
             server_log(SERVER_LOG_ERROR, "Failed to get file information: %s\n", cur_dirent->d_name);
+            send_reply(worker_t->connection, REPCODE_451, strlen(REPCODE_451));
             closedir(dir);
             return -1;
         }else{

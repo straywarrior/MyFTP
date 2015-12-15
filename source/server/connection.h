@@ -24,7 +24,7 @@ enum class FTPCMD{
     ABOR, DELE, RMD, MKD, PWD, LIST, NLST, SITE,
     SYST, STAT, HELP, NOOP,
     // Unknown Commands
-    UNKNOWN, ERROR
+    UNKNOWN, ERROR, UNIMPL
 };
 
 FTPCMD read_command(int connection, char * arg_buf); 

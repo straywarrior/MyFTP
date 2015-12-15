@@ -89,11 +89,14 @@ int worker_run(myftpserver_worker_t * worker_t) {
             conn_close = true;
             continue;
         }
+        if (cur_cmd == FTPCMD::UNIMPL){
+            send_reply(conn_handle, REPCODE_502, strlen(REPCODE_502));
+            continue;
+        }
         if (cur_cmd == FTPCMD::UNKNOWN){
             send_reply(conn_handle, REPCODE_503, strlen(REPCODE_503));
             continue;
         }
-
         if (!user_login){
             switch (cur_cmd){
                case FTPCMD::USER:
@@ -122,6 +125,10 @@ int worker_run(myftpserver_worker_t * worker_t) {
             switch (cur_cmd){
                 case FTPCMD::CWD:
                     // TODO: Add change working dir command.
+                    if (change_dir(worker_t, arg_buf) < 0){
+                        send_reply(conn_handle, REPCODE_550, strlen(REPCODE_550));
+                    };
+                    send_reply(conn_handle, REPCODE_250, strlen(REPCODE_250));
                     break;
                 case FTPCMD::PORT:
                     // TODO: RFC 959 minimum

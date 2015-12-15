@@ -128,6 +128,7 @@ int worker_run(myftpserver_worker_t * worker_t) {
                     if (change_dir(worker_t, arg_buf) < 0){
                         send_reply(conn_handle, REPCODE_550, strlen(REPCODE_550));
                     };
+                    server_log(SERVER_LOG_DEBUG, "Dir changed to %s for connection %d.\n", worker_t->reladir, conn_handle);
                     send_reply(conn_handle, REPCODE_250, strlen(REPCODE_250));
                     break;
                 case FTPCMD::PORT:

@@ -18,8 +18,8 @@ static void clean_path(char * path){
     std::string sec;
 
     path_str += "/";
-    for (int i = 0; i < path_str.size(); ++i){
-        if (path[i] == '/'){
+    for (int i = 0; i < path_str.length(); ++i){
+        if (path_str[i] == '/'){
             if (sec.empty()) continue;
             if (sec == "."){
                 // Do Nothing
@@ -31,7 +31,7 @@ static void clean_path(char * path){
             }
             sec = "";
         }else{
-            sec += path[i];
+            sec += path_str[i];
         }
     }
 
@@ -119,6 +119,7 @@ static int get_fileinfo(const char * cur_dir, const char * filename, char * file
 int change_dir(myftpserver_worker_t * worker_t, const char * pathname){
     char dir_buf[MAX_PATH_LEN];
     sprintf(dir_buf, "%s/%s", worker_t->reladir, pathname);
+    server_log(SERVER_LOG_DEBUG, "Changing dir to %s\n", dir_buf);
     clean_path(dir_buf);
     char absolute_dir[MAX_PATH_LEN];
     sprintf(absolute_dir, "%s/%s", worker_t->rootdir, dir_buf);
@@ -127,7 +128,7 @@ int change_dir(myftpserver_worker_t * worker_t, const char * pathname){
         return -1;
     }
     // Success: change the relative path in worker_t.
-    strcpy(worker_t->reladir, dir_buf);
+    sprintf(worker_t->reladir, "%s", dir_buf);
     closedir(dir);
     return 0;
 }

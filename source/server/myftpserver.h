@@ -20,6 +20,7 @@
 #include <arpa/inet.h>
 #include <string.h>
 #ifndef _WIN32
+#include <errno.h>
 #include <sys/types.h>
 #include <sys/fcntl.h>
 #include <sys/socket.h>

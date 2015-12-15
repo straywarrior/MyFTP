@@ -57,10 +57,46 @@ static DIR * open_dir(const char * path){
     return dir;
 }
 
-static int get_fileinfo(const char * filename, char * fileinfo){
+static int get_fileinfo(const char * cur_dir, const char * filename, char * fileinfo){
     struct stat stat_buf;
     const int date_bufsize = 32;
-    if (stat(filename, &stat_buf) != 0){
+    char name_buf[MAX_PATH_LEN];
+    sprintf(name_buf, "%s/%s", cur_dir, filename);
+    if (stat(name_buf, &stat_buf) != 0){
+        int err = errno;
+        switch (err){
+            case EACCES:
+                server_log(SERVER_LOG_ERROR, "Search permission is denied.\n");
+                break;
+            case EBADF:
+                server_log(SERVER_LOG_ERROR, "fd is bad.\n");
+                break;
+            case EFAULT:
+                server_log(SERVER_LOG_ERROR, "Bad address.\n");
+                break;
+            case ELOOP:
+                server_log(SERVER_LOG_ERROR, "Too many symbolic links encountered while traversing the path.\n");
+                break;
+            case ENAMETOOLONG:
+                server_log(SERVER_LOG_ERROR, "pathname is too long.\n");
+                break;
+            case ENOENT:
+                server_log(SERVER_LOG_ERROR, "A component of pathname does not exist, or pathname is an empty string.\n");
+                break;
+            case ENOMEM:
+                server_log(SERVER_LOG_ERROR, "Out of memory.\n");
+                break;
+            case ENOTDIR:
+                server_log(SERVER_LOG_ERROR, "A component of the path prefix of pathname is not a directory.\n");
+                break;
+            case EOVERFLOW:
+                server_log(SERVER_LOG_ERROR, "pathname or fd refers to a file whose size, inode number, or number of blocks cannot be represented in.\n");
+                break;
+            case EINVAL:
+                server_log(SERVER_LOG_ERROR, "Invalid flag specified in flags.\n");
+                break;
+        }
+
         return -1;
     }else{
         char date[date_bufsize];
@@ -107,7 +143,7 @@ int list_dir(myftpserver_worker_t * worker_t){
         struct dirent * cur_dirent = readdir(dir);
         if (!cur_dirent)
             break;
-        if (get_fileinfo(cur_dirent->d_name, fileinfo) != 0){
+        if (get_fileinfo(cur_path, cur_dirent->d_name, fileinfo) != 0){
             server_log(SERVER_LOG_ERROR, "Failed to get file information: %s\n", cur_dirent->d_name);
             send_reply(worker_t->connection, REPCODE_451, strlen(REPCODE_451));
             closedir(dir);

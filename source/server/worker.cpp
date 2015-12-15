@@ -170,9 +170,14 @@ int worker_run(myftpserver_worker_t * worker_t) {
                     list_dir(worker_t);
                     close_data_connection(conn_handle, data_conn);
                     break;
+                case FTPCMD::SIZE:
+                    // TODO: Needed by Chrome ftp. What the hell... RFC 3659
+                    char send_buf_size[32];
+                    prepare_reply(send_buf_size, REPCODE_213_SIZE, (long long)250);
+                    send_reply(conn_handle, send_buf_size, strlen(send_buf_size));
+                    break;
                 case FTPCMD::HELP:
                     send_help(conn_handle);
-
                     break;
                 case FTPCMD::NOOP:
                     break;

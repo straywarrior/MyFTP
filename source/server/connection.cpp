@@ -74,7 +74,7 @@ FTPCMD parse_command(char * read_buf, char * arg_buf){
             return FTPCMD::PORT;
         }
         if (strncasecmp(read_buf, "PASV", 4) == 0){
-            // FIXME: Needed by Safari
+            // FIXME: Needed by Safari/Chrome
             return FTPCMD::UNIMPL;
         }
         if (strncasecmp(read_buf, "TYPE", 4) == 0){
@@ -97,6 +97,9 @@ FTPCMD parse_command(char * read_buf, char * arg_buf){
         }
         if (strncasecmp(read_buf, "NOOP", 4) == 0){
             return FTPCMD::NOOP;
+        }
+        if (strncasecmp(read_buf, "SIZE", 4) == 0){
+            return FTPCMD::SIZE;
         }
         if (strncasecmp(read_buf, "LIST", 4) == 0){
             return FTPCMD::LIST;

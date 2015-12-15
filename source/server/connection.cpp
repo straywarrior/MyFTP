@@ -118,7 +118,7 @@ int split_arg(const char * cmd_buf, char * arg_buf){
         c++;
         d++;
     }
-    *d = '\n';
+    *d = '\0';
     return 0; 
 }
 
@@ -129,4 +129,44 @@ int send_reply(int connection, const char * send_buf, int len){
     }else{
         return 0;
     }
+}
+
+int send_help(int connection){
+    char command_impled[] =
+        "USER PASS PWD SYST QUIT";
+    char help_msg[128] = "All avaliable commands: ";
+    strcpy(help_msg, command_impled);
+    send_reply(connection, help_msg, strlen(help_msg));
+
+    return 0;
+}
+
+
+/*
+ * Data Connection
+ */
+int open_data_connection(int connection, unsigned int v4addr, unsigned int port){
+    server_log(SERVER_LOG_DEBUG, "Opening data connection at %08x:%d for connection %d.\n", v4addr, port, connection);
+    int data_conn;
+    struct sockaddr_in data_sock_addr;
+    data_sock_addr.sin_family = AF_INET;
+    data_sock_addr.sin_addr.s_addr = v4addr;
+    data_sock_addr.sin_port = htons(port);
+    if ((data_conn = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0){
+        server_log(SERVER_LOG_FATAL, "Cannot open data sock at %08x:%d for connection %d.\n", v4addr, port, connection);
+        send_reply(connection, REPCODE_425, strlen(REPCODE_425));
+        return -1;
+    }
+    if ((connect(data_conn, (struct sockaddr*)&data_sock_addr, sizeof(data_sock_addr))) < 0){
+        server_log(SERVER_LOG_FATAL, "Cannot open data connection at %08x:%d for connection %d.\n", v4addr, port, connection);
+        send_reply(connection, REPCODE_425, strlen(REPCODE_425));
+        return -1;
+    }
+    return data_conn;
+}
+
+int close_data_connection(int connection, int data_conn){
+    close(data_conn);
+    send_reply(connection, REPCODE_226, strlen(REPCODE_226));
+    return 0;
 }

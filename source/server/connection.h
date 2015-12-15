@@ -39,10 +39,12 @@ int split_arg(const char * cmd_buf, char * arg_bug);
 
 #define prepare_reply(send_buf, reply_fmt, ...) sprintf(send_buf, reply_fmt, __VA_ARGS__)
 int send_reply(int connection, const char * send_buf, int len);
+int send_help(int connection);
 
 /*
  * Data Connection
  */
-
+int open_data_connection(int connection, unsigned int v4addr, unsigned int port);
+int close_data_connection(int connection, int data_conn);
 
 #endif /* !_MYFTP_CONNECTIONS_H_ */

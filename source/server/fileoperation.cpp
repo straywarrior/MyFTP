@@ -116,7 +116,21 @@ static int get_fileinfo(const char * cur_dir, const char * filename, char * file
     }
 }
 
-int change_dir(myftpserver_worker_t * worker_t, const char * pathname);
+int change_dir(myftpserver_worker_t * worker_t, const char * pathname){
+    char dir_buf[MAX_PATH_LEN];
+    sprintf(dir_buf, "%s/%s", worker_t->reladir, pathname);
+    clean_path(dir_buf);
+    char absolute_dir[MAX_PATH_LEN];
+    sprintf(absolute_dir, "%s/%s", worker_t->rootdir, dir_buf);
+    DIR * dir = open_dir(absolute_dir);
+    if (!dir){
+        return -1;
+    }
+    // Success: change the relative path in worker_t.
+    strcpy(worker_t->reladir, dir_buf);
+    closedir(dir);
+    return 0;
+}
 int get_cur_path(myftpserver_worker_t * worker_t, char * result){
     result[0] = '\0';
     strcat(result, worker_t->reladir);

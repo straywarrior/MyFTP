@@ -44,7 +44,7 @@ static void clean_path(char * path){
         }
         strcpy(path, result.c_str());
     }
-    server_log(SERVER_LOG_DEBUG, "Path clean done: %s\n", result.c_str());
+    server_log(SERVER_LOG_DEBUG, "Path clean done: %s\n", path);
 }
 
 static DIR * open_dir(const char * path){

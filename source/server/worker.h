@@ -15,6 +15,7 @@
 struct myftpserver_worker_t{
     myftpserver_t * server;
     int connection;
+
     char rootdir[MAX_PATH_LEN];     // Root dir. User cannot escape out of the dir!!
     int rootdirfd;
     char reladir[MAX_PATH_LEN];   // Relative path to rootdir
@@ -24,6 +25,8 @@ struct myftpserver_worker_t{
 
     unsigned int data_v4addr;     // IPv4 Address of Data Connection
     unsigned int data_port;       // Port of Data Connection
+    int data_conn;
+
     ~myftpserver_worker_t();
 };
 

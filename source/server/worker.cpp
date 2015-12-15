@@ -9,6 +9,7 @@
 
 #include "worker.h"
 #include "connection.h"
+#include "fileoperation.h"
 
 static int get_data_conn_parm(char * arg_buf, unsigned int * data_v4addr, unsigned int * data_port){
     char addr_buf[16];
@@ -94,7 +95,7 @@ int worker_run(myftpserver_worker_t * worker_t) {
         if (!user_login){
             switch (cur_cmd){
                case FTPCMD::USER:
-                    if (arg_buf == nullptr || strlen(arg_buf) == 0){
+                    if (strlen(arg_buf) == 0){
                         send_reply(conn_handle, REPCODE_501, strlen(REPCODE_501));
                         break;
                     }
@@ -106,7 +107,7 @@ int worker_run(myftpserver_worker_t * worker_t) {
                     break;
                 case FTPCMD::PASS:
                     // TODO: Add Password-check after adding config-read
-                    if (worker_t->username != nullptr){
+                    if (strlen(worker_t->username) > 0){
                         user_login = true;
                         send_reply(conn_handle, REPCODE_230, strlen(REPCODE_230));
                     }
@@ -155,6 +156,8 @@ int worker_run(myftpserver_worker_t * worker_t) {
                 case FTPCMD::LIST:
                     int data_conn;
                     data_conn = open_data_connection(conn_handle, worker_t->data_v4addr, worker_t->data_port);
+                    worker_t->data_conn = data_conn;
+                    list_dir(worker_t);
                     close_data_connection(conn_handle, data_conn);
                     break;
                 case FTPCMD::HELP:

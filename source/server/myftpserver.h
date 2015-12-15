@@ -75,6 +75,7 @@ typedef struct myftpserver_t{
 #define REPCODE_211 "211 System status, or system help reply.\r\n"
 #define REPCODE_212 "212 Directory status.\r\n"
 #define REPCODE_213 "213 File status.\r\n"
+#define REPCODE_213_SIZE "213 %lld\r\n"
 #define REPCODE_214 "214 Help message.\r\n"
 #define REPCODE_215 "215 %s system type.\r\n"
 #define REPCODE_220 "220 Service ready for new user.\r\n"

@@ -23,6 +23,8 @@ enum class FTPCMD{
     RETR, STOR, STOU, APPE, ALLO, REST, RNFR, RNTO,
     ABOR, DELE, RMD, MKD, PWD, LIST, NLST, SITE,
     SYST, STAT, HELP, NOOP,
+    // Commands not in RFC 959
+    SIZE,
     // Unknown Commands
     UNKNOWN, ERROR, UNIMPL
 };

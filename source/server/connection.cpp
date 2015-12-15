@@ -57,7 +57,7 @@ FTPCMD parse_command(char * read_buf, char * arg_buf){
             return FTPCMD::PWD;
         }
         if (strncasecmp(read_buf, "CWD", 3) == 0){
-            return FTPCMD::PWD;
+            return FTPCMD::CWD;
         }
     }
     if (cmd_len == 4){

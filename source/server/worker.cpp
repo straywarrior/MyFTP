@@ -57,7 +57,9 @@ static int get_data_conn_parm(char * arg_buf, unsigned int * data_v4addr, unsign
 }
 
 static void get_system_str(char * buf){
-#ifdef __linux__
+#if defined( __APPLE__)
+    strcpy(buf, "OSX");
+#elif defined(__linux__)
     strcpy(buf, "LINUX");
 #endif
 }

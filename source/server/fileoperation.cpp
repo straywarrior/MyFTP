@@ -96,12 +96,20 @@ static int get_fileinfo(const char * cur_dir, const char * filename, char * file
                 server_log(SERVER_LOG_ERROR, "Invalid flag specified in flags.\n");
                 break;
         }
-
+        server_log(SERVER_LOG_ERROR, "Failed to get file information: %s\n", filename);
         return -1;
     }else{
         char date[date_bufsize];
         char mode[11] = "----------";
-        
+        int bit_mask = stat_buf.st_mode & S_IFMT;
+        if (bit_mask == S_IFDIR){
+            mode[0] = 'd';
+        }else if (bit_mask == S_IFREG){
+            mode[0] = '-';
+        }else{
+            server_log(SERVER_LOG_WARNING, "%s is not a regular file.\n", filename);
+            return -2;
+        }
         strftime(date, date_bufsize, "%D %R", localtime(&(stat_buf.st_mtime)));
         sprintf(fileinfo, "%s %d %s %s %lld %s %s\r\n", mode, stat_buf.st_nlink, "-", "-", stat_buf.st_size, date, filename);
         return 0;
@@ -141,12 +149,8 @@ int list_dir(myftpserver_worker_t * worker_t){
         struct dirent * cur_dirent = readdir(dir);
         if (!cur_dirent)
             break;
-        if (get_fileinfo(cur_path, cur_dirent->d_name, fileinfo) != 0){
-            server_log(SERVER_LOG_ERROR, "Failed to get file information: %s\n", cur_dirent->d_name);
-            send_reply(worker_t->connection, REPCODE_451, strlen(REPCODE_451));
-            closedir(dir);
-            return -1;
-        }else{
+        int status = get_fileinfo(cur_path, cur_dirent->d_name, fileinfo);
+        if (status == 0){
             server_log(SERVER_LOG_DEBUG, "Sending file information: %s\n", cur_dirent->d_name);
             send_reply(data_conn, fileinfo, strlen(fileinfo));
         }

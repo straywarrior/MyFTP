@@ -72,7 +72,7 @@ int worker_run(myftpserver_worker_t * worker_t) {
     // TODO: Read username and user-dir from config dir
     
     strcpy(worker_t->rootdir, worker_t->server->default_dir);
-    strcpy(worker_t->reladir, ".");
+    strcpy(worker_t->reladir, "/");
     
     bool conn_close = false;
     bool user_login = false;

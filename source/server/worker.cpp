@@ -20,8 +20,10 @@ static int get_data_conn_parm(char * arg_buf, unsigned int * data_v4addr, unsign
     while (sec_count < 4 && p_second && *p_second != '\0'){
         if (*p_second == ','){
             strncpy(sec, p_first, p_second - p_first);
+            sec[p_second - p_first] = '\0';
             strcat(addr_buf, sec);
             sec_count++;
+            server_log(SERVER_LOG_DEBUG, "IP Section: %s ", sec);
             if (sec_count != 4){
                 strcat(addr_buf, ".");
             }
@@ -33,15 +35,19 @@ static int get_data_conn_parm(char * arg_buf, unsigned int * data_v4addr, unsign
     if (sec_count != 4){
         return -1;
     }
+    server_log(SERVER_LOG_DEBUG, "\nData Connection IP parsed: %s \n", addr_buf);
     
     int port = 0;
     // The High-8bit
     p_second = strstr(p_first, ",");
     strncpy(sec, p_first, p_second - p_first);
+    sec[p_second - p_first] = '\0';
+    server_log(SERVER_LOG_DEBUG, "Port Section: %s ", sec);
     port = atoi(sec) * 256;
     // The Low-8bit
     p_first = ++p_second;
     strcpy(sec, p_first);
+    server_log(SERVER_LOG_DEBUG, "Port Section: %s ", sec);
     port += atoi(sec);
     
     *data_v4addr = (unsigned int)inet_addr(addr_buf);
@@ -51,7 +57,7 @@ static int get_data_conn_parm(char * arg_buf, unsigned int * data_v4addr, unsign
 
 static void get_system_str(char * buf){
 #ifdef __linux__
-    strcpy(buf, "LINUX\r\n");
+    strcpy(buf, "LINUX");
 #endif
 }
 
@@ -116,7 +122,11 @@ int worker_run(myftpserver_worker_t * worker_t) {
                     break;
                 case FTPCMD::PORT:
                     // TODO: RFC 959 minimum
-                    get_data_conn_parm(arg_buf, &(worker_t->data_v4addr), &(worker_t->data_port));
+                    if (get_data_conn_parm(arg_buf, &(worker_t->data_v4addr), &(worker_t->data_port)) < 0){
+                        send_reply(conn_handle, REPCODE_501, strlen(REPCODE_501));
+                    }else{
+                        send_reply(conn_handle, REPCODE_200, strlen(REPCODE_200));
+                    }
                     break;
                 case FTPCMD::TYPE:
                     // TODO: RFC 959 minimum
@@ -134,11 +144,18 @@ int worker_run(myftpserver_worker_t * worker_t) {
 
                     break;
                 case FTPCMD::PWD:
-
+                    char cur_dir[MAX_PATH_LEN];
+                    get_cur_path(worker_t, cur_dir);
+                    strcat(cur_dir, EOL);
+                    send_reply(conn_handle, cur_dir, strlen(cur_dir));
                     break;
                 case FTPCMD::LIST:
+                    int data_conn;
+                    data_conn = open_data_connection(conn_handle, worker_t->data_v4addr, worker_t->data_port);
+                    close_data_connection(conn_handle, data_conn);
                     break;
                 case FTPCMD::HELP:
+                    send_help(conn_handle);
 
                     break;
                 case FTPCMD::NOOP:
@@ -147,7 +164,9 @@ int worker_run(myftpserver_worker_t * worker_t) {
                     // Sent by FTP built-in Linux
                     char buf[10];
                     get_system_str(buf);
-                    send_reply(conn_handle, buf, strlen(buf));
+                    char send_buf[100];
+                    prepare_reply(send_buf, REPCODE_215, buf);
+                    send_reply(conn_handle, send_buf, strlen(send_buf));
                     break;
                 default:
                     break;

@@ -100,14 +100,12 @@ static int get_fileinfo(const char * cur_dir, const char * filename, char * file
         return -1;
     }else{
         char date[date_bufsize];
-        strftime(date, date_bufsize, "%F %R", localtime(&(stat_buf.st_mtime)));
-        sprintf(fileinfo, "%s %lld %s\r\n", filename, stat_buf.st_size, date);
+        char mode[11] = "----------";
+        
+        strftime(date, date_bufsize, "%D %R", localtime(&(stat_buf.st_mtime)));
+        sprintf(fileinfo, "%s %d %s %s %lld %s %s\r\n", mode, stat_buf.st_nlink, "-", "-", stat_buf.st_size, date, filename);
         return 0;
     }
-}
-
-int init_working_dir(myftpserver_worker_t * worker_t){
-    return 0;
 }
 
 int change_dir(myftpserver_worker_t * worker_t, const char * pathname);
@@ -157,6 +155,4 @@ int list_dir(myftpserver_worker_t * worker_t){
     closedir(dir);
     return 0;
 }
-
-int close_working_dir(myftpserver_worker_t * worker_t);
 

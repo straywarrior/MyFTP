@@ -31,7 +31,7 @@ FTPCMD read_command(int connection, char * arg_buf){
         return FTPCMD::UNKNOWN;
     }
     read_buf[recv_len] = '\0';
-    server_log(SERVER_LOG_DEBUG, "Read %d bytes from client: %s.\n", recv_len, read_buf);
+    server_log(SERVER_LOG_DEBUG, "Read %d bytes from client: %s", recv_len, read_buf);
     FTPCMD result = parse_command(read_buf, arg_buf);
     return result;
 }
@@ -47,7 +47,6 @@ FTPCMD parse_command(char * read_buf, char * arg_buf){
         *c = (char)(toupper(*c));
     }
     int cmd_len = c - read_buf;
-    server_log(SERVER_LOG_DEBUG, "Space found. Command length: %d\n", cmd_len);
     if (cmd_len < 3 || cmd_len > 4){
         server_log(SERVER_LOG_WARNING, "Invalid command.\n");
         return FTPCMD::UNKNOWN;

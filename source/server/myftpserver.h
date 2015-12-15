@@ -83,7 +83,7 @@ typedef struct myftpserver_t{
 #define REPCODE_227 "227 Entering Passive Mode (%s,%s,%s,%s,%s,%s).\r\n"
 #define REPCODE_230 "230 User logged in, proceed.\r\n"
 #define REPCODE_250 "250 Requested file action okay, completed.\r\n"
-#define REPCODE_257 "257 "%s" created.\r\n"
+#define REPCODE_257 "257 \"%s\" created.\r\n"
 
 #define REPCODE_331 "331 User name okay, need password.\r\n"
 #define REPCODE_332 "332 Need account for login.\r\n"

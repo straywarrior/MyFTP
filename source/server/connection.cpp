@@ -162,6 +162,7 @@ int open_data_connection(int connection, unsigned int v4addr, unsigned int port)
         send_reply(connection, REPCODE_425, strlen(REPCODE_425));
         return -1;
     }
+    server_log(SERVER_LOG_DEBUG, "Data connection at %08x:%d for connection %d opened.\n", v4addr, port, connection);
     return data_conn;
 }
 

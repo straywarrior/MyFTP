@@ -130,6 +130,7 @@ int worker_run(myftpserver_worker_t * worker_t) {
                     break;
                 case FTPCMD::TYPE:
                     // TODO: RFC 959 minimum
+                    send_reply(conn_handle, REPCODE_200, strlen(REPCODE_200));
                     break;
                 case FTPCMD::STRU:
                     // TODO: RFC 959 minimum
@@ -146,8 +147,10 @@ int worker_run(myftpserver_worker_t * worker_t) {
                 case FTPCMD::PWD:
                     char cur_dir[MAX_PATH_LEN];
                     get_cur_path(worker_t, cur_dir);
-                    strcat(cur_dir, EOL);
-                    send_reply(conn_handle, cur_dir, strlen(cur_dir));
+                    //strcat(cur_dir, EOL);
+                    char send_buf_pwd[MAX_PATH_LEN];
+                    prepare_reply(send_buf_pwd, REPCODE_257, cur_dir);
+                    send_reply(conn_handle, send_buf_pwd, strlen(send_buf_pwd));
                     break;
                 case FTPCMD::LIST:
                     int data_conn;
@@ -164,9 +167,9 @@ int worker_run(myftpserver_worker_t * worker_t) {
                     // Sent by FTP built-in Linux
                     char buf[10];
                     get_system_str(buf);
-                    char send_buf[100];
-                    prepare_reply(send_buf, REPCODE_215, buf);
-                    send_reply(conn_handle, send_buf, strlen(send_buf));
+                    char send_buf_syst[100];
+                    prepare_reply(send_buf_syst, REPCODE_215, buf);
+                    send_reply(conn_handle, send_buf_syst, strlen(send_buf_syst));
                     break;
                 default:
                     break;

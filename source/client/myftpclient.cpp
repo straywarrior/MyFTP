@@ -15,6 +15,8 @@
 
 using optparse::OptionParser;
 
+int log_level = 3;
+
 static int start_client(myftpclient_t * client_t){
     bool user_login = false;
 
@@ -94,6 +96,7 @@ static int start_client(myftpclient_t * client_t){
                     struct sockaddr_in data_sock_addr;
                     data_conn = open_and_send_data_port(client_sock, &data_sock_addr, client_t->local_ipv4addr);
                     send_msg(client_sock, cmd_buf.c_str());
+                    recv_and_show_reply(client_sock);
                     store_file(client_sock, data_conn, &data_sock_addr, arg_buf);
                     close_data_connection(client_sock, data_conn);
                     recv_and_show_reply(client_sock);
@@ -104,6 +107,7 @@ static int start_client(myftpclient_t * client_t){
                     struct sockaddr_in data_sock_addr;
                     data_conn = open_and_send_data_port(client_sock, &data_sock_addr, client_t->local_ipv4addr);
                     send_msg(client_sock, cmd_buf.c_str());
+                    recv_and_show_reply(client_sock);
                     retrieve_file(client_sock, data_conn, &data_sock_addr, arg_buf);
                     close_data_connection(client_sock, data_conn);
                     recv_and_show_reply(client_sock);
@@ -134,7 +138,7 @@ int main(int argc, char * argv[]){
     myftp_log(MYFTP_LOG_INFO, "Starting MyFTP Client... \n");
 
     OptionParser parser = OptionParser().description("MyFTP Server.");
-    parser.add_option("-v", "--verbose").dest("verbose").type("int").set_default("4")
+    parser.add_option("-v", "--verbose").dest("verbose").type("int").set_default("3")
         .help("Set log level. Default: 3 - INFO");
     parser.add_option("-p", "--port").dest("port").type("int").set_default("21")
         .help("Set server port. Default: 21");
@@ -151,6 +155,8 @@ int main(int argc, char * argv[]){
     optparse::Values & options = parser.parse_args(argc, argv);
 
     myftpclient_t client_t;
+
+    log_level = (int)options.get("verbose");
 
     client_t.port = (unsigned int)options.get("port");
     myftp_log(MYFTP_LOG_INFO, "Server port parsed: %d \n", client_t.port);

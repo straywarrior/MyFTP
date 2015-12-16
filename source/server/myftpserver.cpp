@@ -14,6 +14,8 @@
 
 using optparse::OptionParser;
 
+int log_level = 3;
+
 int start_server(myftpserver_t * server_t){
     // Create a socket
     int server_sock;
@@ -93,7 +95,7 @@ int main(int argc, char * argv[]){
     server_log(SERVER_LOG_INFO, "Starting MyFTP Server... \n");
 
     OptionParser parser = OptionParser().description("MyFTP Server.");
-    parser.add_option("-v", "--verbose").dest("verbose").type("int").set_default("4")
+    parser.add_option("-v", "--verbose").dest("verbose").type("int").set_default("3")
         .help("Set log level. Default: 3 - INFO");
     parser.add_option("-p", "--port").dest("port").type("int").set_default("21")
         .help("Set listening port. Default: 21");
@@ -112,6 +114,8 @@ int main(int argc, char * argv[]){
     optparse::Values & options = parser.parse_args(argc, argv);
 
     myftpserver_t server_t;
+
+    log_level = (int)options.get("verbose");
 
     server_t.port = (unsigned int)options.get("port");
     server_log(SERVER_LOG_INFO, "Server port parsed: %d \n", server_t.port);

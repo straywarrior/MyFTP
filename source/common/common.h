@@ -78,6 +78,8 @@ int send_msg(int ctl_conn, const char * send_buf, int len);
 #define MYFTP_LOG_WARNING  2
 #define MYFTP_LOG_INFO     3
 #define MYFTP_LOG_DEBUG    4
-#define myftp_log(level, fmt...) fprintf(stderr, fmt)
+
+extern int log_level;
+#define myftp_log(level, fmt...) (level <= log_level) ? fprintf(stderr, fmt) : 0
 
 #endif /* !_COMMON_H_ */

@@ -101,6 +101,7 @@ static int get_filestat(const char * filename, struct stat * stat_buf){
         }
         return -1;
     }
+    return 0;
 }
 
 static int get_fileinfo(const char * cur_dir, const char * filename, char * fileinfo){
@@ -235,10 +236,48 @@ int retrieve_file(myftpserver_worker_t * worker_t, const char * filename){
             break;
         }
     }
+    close(frd_handle);
 
     return 0;
 }
 
 int store_file(myftpserver_worker_t * worker_t, const char * filename){
+    char fwrite_buf[MAX_SEND_BUF];
+    int ctl_conn = worker_t->connection;
+    int data_conn = worker_t->data_conn;
+
+    if (data_conn > 0){
+        send_reply(ctl_conn, REPCODE_150);
+    }else{
+        send_reply(ctl_conn, REPCODE_425);
+        return -1;
+    }
+    // Check the file
+    char name_buf[MAX_PATH_LEN];
+
+    // FIXME: How can I know whether the filename is absolute or relative?
+    get_absolute_path(worker_t, name_buf);
+    strcat(name_buf, "/");
+    strcat(name_buf, filename);
+
+    int fwr_handle = open(name_buf, O_WRONLY|O_CREAT, 0644);
+    if (fwr_handle < 0){
+        server_log(SERVER_LOG_ERROR, "Cannot open file %s\n", name_buf);
+        send_reply(ctl_conn, REPCODE_451);
+        return -1;
+    }
+
+    // Sending the file.
+    // FIXME: STREAM or other MODE?
+    while (true){
+        int len = recv(data_conn, fwrite_buf, MAX_SEND_BUF, 0);
+        if (len > 0){
+            write(fwr_handle, fwrite_buf, len);
+        }else{
+            break;
+        }
+    }
+    close(fwr_handle);
+
     return 0;
 }

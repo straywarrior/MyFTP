@@ -46,6 +46,10 @@
 #define RETRY_TIME          1             // Retry after 1 minutes.
 #define EOL                 "\r\n"
 
+#define TRANSMODE_S         0
+#define TRANSMODE_B         1
+#define TRANSCODE_C         2
+
 #define MAX_PATH_LEN        256           // Max length of working path
 #define MAX_READ_BUF        1024
 #define MAX_SEND_BUF        512

@@ -64,6 +64,25 @@ static void get_system_str(char * buf){
 #endif
 }
 
+static int set_mode(myftpserver_worker_t * worker_t, char * arg_buf){
+    if (strlen(arg_buf) != 1){
+        return -1;
+    }
+    char mode = arg_buf[0];
+    switch(mode){
+        case 'S':
+            worker_t->mode = TRANSMODE_S;
+            break;
+        case 'B':
+            return -2;
+        case 'C':
+            return -2;
+        default:
+            return -1;
+    }
+    return 0;
+}
+
 myftpserver_worker_t::~myftpserver_worker_t(){
     this->server = nullptr;    
 }
@@ -156,6 +175,21 @@ int worker_run(myftpserver_worker_t * worker_t) {
                     break;
                 case FTPCMD::MODE:
                     // TODO: RFC 959 minimum
+                    {
+                        int set_mode_status = set_mode(worker_t, arg_buf);
+                        switch (set_mode_status){
+                            case 0:
+                                send_reply(conn_handle, REPCODE_200);
+                                break;
+                            case -1:
+                                send_reply(conn_handle, REPCODE_501);
+                                break;
+                            case -2:
+                            default:
+                                send_reply(conn_handle, REPCODE_504);
+                                break;
+                        }
+                    }
                     break;
                 case FTPCMD::RETR:
                     data_conn = open_data_connection(conn_handle, worker_t->data_v4addr, worker_t->data_port);
@@ -164,16 +198,21 @@ int worker_run(myftpserver_worker_t * worker_t) {
                     close_data_connection(conn_handle, data_conn);
                     break;
                 case FTPCMD::STOR:
-
+                    data_conn = open_data_connection(conn_handle, worker_t->data_v4addr, worker_t->data_port);
+                    worker_t->data_conn = data_conn;
+                    store_file(worker_t, arg_buf);
+                    close_data_connection(conn_handle, data_conn);
                     break;
                 case FTPCMD::PWD:
-                    char cur_dir[MAX_PATH_LEN];
-                    get_cur_path(worker_t, cur_dir);
-                    //strcat(cur_dir, EOL);
-                    char send_buf_pwd[MAX_PATH_LEN];
-                    prepare_reply(send_buf_pwd, REPCODE_257, cur_dir);
-                    send_reply(conn_handle, send_buf_pwd, strlen(send_buf_pwd));
-                    break;
+                    {
+                        char cur_dir[MAX_PATH_LEN];
+                        get_cur_path(worker_t, cur_dir);
+                        //strcat(cur_dir, EOL);
+                        char send_buf[MAX_PATH_LEN];
+                        prepare_reply(send_buf, REPCODE_257, cur_dir);
+                        send_reply(conn_handle, send_buf);
+                        break;
+                    }
                 case FTPCMD::LIST:
                     data_conn = open_data_connection(conn_handle, worker_t->data_v4addr, worker_t->data_port);
                     worker_t->data_conn = data_conn;
@@ -182,23 +221,28 @@ int worker_run(myftpserver_worker_t * worker_t) {
                     break;
                 case FTPCMD::SIZE:
                     // TODO: Needed by Chrome ftp. What the hell... RFC 3659
-                    char send_buf_size[32];
-                    prepare_reply(send_buf_size, REPCODE_213_SIZE, (long long)250);
-                    send_reply(conn_handle, send_buf_size, strlen(send_buf_size));
-                    break;
+                    {
+                        char send_buf[32];
+                        prepare_reply(send_buf, REPCODE_213_SIZE, (long long)250);
+                        send_reply(conn_handle, send_buf);
+                        break;
+                    }
                 case FTPCMD::HELP:
                     send_help(conn_handle);
                     break;
                 case FTPCMD::NOOP:
+                    send_reply(conn_handle, REPCODE_200);
                     break;
                 case FTPCMD::SYST:
                     // Sent by FTP built-in Linux
-                    char buf[10];
-                    get_system_str(buf);
-                    char send_buf_syst[100];
-                    prepare_reply(send_buf_syst, REPCODE_215, buf);
-                    send_reply(conn_handle, send_buf_syst, strlen(send_buf_syst));
-                    break;
+                    {
+                        char buf[10];
+                        get_system_str(buf);
+                        char send_buf[100];
+                        prepare_reply(send_buf, REPCODE_215, buf);
+                        send_reply(conn_handle, send_buf);
+                        break;
+                    }
                 default:
                     send_reply(conn_handle, REPCODE_502, strlen(REPCODE_502));
                     break;

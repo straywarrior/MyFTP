@@ -150,9 +150,9 @@ int send_reply(int connection, const char * send_buf){
 
 int send_help(int connection){
     char command_impled[] =
-        "USER PASS PWD SYST QUIT";
-    char help_msg[128] = "All avaliable commands: ";
-    strcpy(help_msg, command_impled);
+        "USER PASS PWD CWD CDUP PORT RETR STOR SYST QUIT";
+    char help_msg[MAX_SEND_BUF];
+    sprintf(help_msg, "All avaliable commands: %s\r\n", command_impled);
     send_reply(connection, help_msg, strlen(help_msg));
 
     return 0;

@@ -122,10 +122,18 @@ int worker_run(myftpserver_worker_t * worker_t) {
                     break;
             }
         }else{
+            int data_conn;
             switch (cur_cmd){
                 case FTPCMD::CWD:
                     // TODO: Add change working dir command.
                     if (change_dir(worker_t, arg_buf) < 0){
+                        send_reply(conn_handle, REPCODE_550, strlen(REPCODE_550));
+                    };
+                    server_log(SERVER_LOG_DEBUG, "Dir changed to %s for connection %d.\n", worker_t->reladir, conn_handle);
+                    send_reply(conn_handle, REPCODE_250, strlen(REPCODE_250));
+                    break;
+                case FTPCMD::CDUP:
+                    if (change_dir(worker_t, "..") < 0){
                         send_reply(conn_handle, REPCODE_550, strlen(REPCODE_550));
                     };
                     server_log(SERVER_LOG_DEBUG, "Dir changed to %s for connection %d.\n", worker_t->reladir, conn_handle);
@@ -150,7 +158,10 @@ int worker_run(myftpserver_worker_t * worker_t) {
                     // TODO: RFC 959 minimum
                     break;
                 case FTPCMD::RETR:
-                    
+                    data_conn = open_data_connection(conn_handle, worker_t->data_v4addr, worker_t->data_port);
+                    worker_t->data_conn = data_conn;
+                    retrieve_file(worker_t, arg_buf);
+                    close_data_connection(conn_handle, data_conn);
                     break;
                 case FTPCMD::STOR:
 
@@ -164,7 +175,6 @@ int worker_run(myftpserver_worker_t * worker_t) {
                     send_reply(conn_handle, send_buf_pwd, strlen(send_buf_pwd));
                     break;
                 case FTPCMD::LIST:
-                    int data_conn;
                     data_conn = open_data_connection(conn_handle, worker_t->data_v4addr, worker_t->data_port);
                     worker_t->data_conn = data_conn;
                     list_dir(worker_t);
@@ -190,6 +200,7 @@ int worker_run(myftpserver_worker_t * worker_t) {
                     send_reply(conn_handle, send_buf_syst, strlen(send_buf_syst));
                     break;
                 default:
+                    send_reply(conn_handle, REPCODE_502, strlen(REPCODE_502));
                     break;
             }
         }

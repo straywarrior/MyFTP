@@ -40,6 +40,7 @@ int split_arg(const char * cmd_buf, char * arg_bug);
  */
 
 #define prepare_reply(send_buf, reply_fmt, ...) sprintf(send_buf, reply_fmt, __VA_ARGS__)
+int send_reply(int connection, const char * send_buf);
 int send_reply(int connection, const char * send_buf, int len);
 int send_help(int connection);
 

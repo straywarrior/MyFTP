@@ -1,6 +1,10 @@
+# Author: StrayWarrior
+# Date  : 2015-12-16
+
 cmake_minimum_required (VERSION 3.0)
 
 project(myftp)
+
 # Server
 set(SERVER_NAME ${PROJECT_NAME}server)
 

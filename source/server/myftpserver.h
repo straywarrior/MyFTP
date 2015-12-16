@@ -11,31 +11,9 @@
 #define _MYFTP_SERVER_H_ value
 
 /*
- * C header
- */
-#include <stdio.h>
-#include <stdlib.h>
-#include <netdb.h>
-#include <errno.h>
-#include <arpa/inet.h>
-#include <string.h>
-#ifndef _WIN32
-#include <errno.h>
-#include <sys/types.h>
-#include <sys/fcntl.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <unistd.h>
-#endif
-
-/*
- * C++ STL header
- * C++ 11 is needed
- */
-
-/*
  * My header
  */
+#include "../common/common.h"
 
 /*
  * Server Constants Definition
@@ -49,13 +27,6 @@
 #define TRANSMODE_S         0
 #define TRANSMODE_B         1
 #define TRANSCODE_C         2
-
-#define MAX_PATH_LEN        256           // Max length of working path
-#define MAX_READ_BUF        1024
-#define MAX_SEND_BUF        512
-
-#define MAX_USER_NAME       32
-#define MAX_USER_PASS       32
 
 /*
  * The config structure
@@ -117,17 +88,12 @@ typedef struct myftpserver_t{
 #define REPCODE_552 "552 Requested file action aborted.\r\n"
 #define REPCODE_553 "553 Requested action not taken.\r\n"
 
-/*
- * Log Definition
- * FIXME: Real level needs to be added
- * 原谅我ffmpeg和x264看得太多对此类日志系统中毒太深...
- */
-#define SERVER_LOG_FATAL    0
-#define SERVER_LOG_ERROR    1
-#define SERVER_LOG_WARNING  2
-#define SERVER_LOG_INFO     3
-#define SERVER_LOG_DEBUG    4
-#define server_log(level, fmt...) fprintf(stderr, fmt)
+#define SERVER_LOG_FATAL    MYFTP_LOG_FATAL
+#define SERVER_LOG_ERROR    MYFTP_LOG_ERROR
+#define SERVER_LOG_WARNING  MYFTP_LOG_WARNING
+#define SERVER_LOG_INFO     MYFTP_LOG_INFO
+#define SERVER_LOG_DEBUG    MYFTP_LOG_DEBUG
+#define server_log(level, ...) myftp_log(level, __VA_ARGS__)
 
 /*
  * Main Functions Definition

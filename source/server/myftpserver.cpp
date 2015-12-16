@@ -8,12 +8,11 @@
  */
 
 #include "myftpserver.h"
-#include "OptionParser.h"
+#include "../common/OptionParser.h"
 #include "worker.h"
 #include <map>
 
 using optparse::OptionParser;
-
 
 int start_server(myftpserver_t * server_t){
     // Create a socket

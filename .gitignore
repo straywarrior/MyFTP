@@ -33,3 +33,5 @@ build/*/CMakeFiles/
 
 # Temporary files
 .*.swp
+.DS_Store
+

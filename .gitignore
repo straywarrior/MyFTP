@@ -2,6 +2,10 @@
 Makefile
 CMakeCache.*
 build/*/CMakeFiles/
+*.cmake
+myftpserver
+myftpclient
+
 # Compiled Object files
 *.slo
 *.lo

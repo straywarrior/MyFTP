@@ -139,6 +139,7 @@ int send_reply(int connection, const char * send_buf, int len){
         server_log(SERVER_LOG_ERROR, "Failed to send reply to client. Terminating...\n");
         return -1;
     }else{
+        server_log(SERVER_LOG_DEBUG, "Sent %d bytes to client.\n", len);
         return 0;
     }
 }

@@ -16,8 +16,9 @@
  * The config structure
  */
 typedef struct myftpclient_t{
-    unsigned int port;
-    unsigned int ipv4addr;
+    unsigned int port;      // In host sequence
+    unsigned int server_ipv4addr;  // In network sequence
+    unsigned int local_ipv4addr;  // In network sequence
     char user[MAX_USER_NAME];
 }myftpclient_t;
 

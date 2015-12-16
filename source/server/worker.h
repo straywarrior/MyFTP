@@ -25,6 +25,10 @@ struct myftpserver_worker_t{
     unsigned int data_port;       // Port of Data Connection
     int data_conn;
 
+    uint8_t mode;
+    uint8_t type;
+    uint8_t stru;
+
     ~myftpserver_worker_t();
 };
 

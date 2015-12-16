@@ -95,7 +95,7 @@ int main(int argc, char * argv[]){
 
     OptionParser parser = OptionParser().description("MyFTP Server.");
     parser.add_option("-v", "--verbose").dest("verbose").type("int").set_default("4")
-        .help("Set log level. Default: INFO");
+        .help("Set log level. Default: 3 - INFO");
     parser.add_option("-p", "--port").dest("port").type("int").set_default("21")
         .help("Set listening port. Default: 21");
     parser.add_option("-i", "--IP").dest("ip").set_default("127.0.0.1")

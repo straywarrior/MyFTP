@@ -88,8 +88,8 @@ myftpserver_worker_t::~myftpserver_worker_t(){
 }
 
 int worker_run(myftpserver_worker_t * worker_t) {
-    int conn_handle = worker_t->connection;
-    send_reply(conn_handle, REPCODE_220, strlen(REPCODE_220));
+    int ctl_conn = worker_t->connection;
+    send_msg(ctl_conn, REPCODE_220, strlen(REPCODE_220));
 
     // TODO: Read username and user-dir from config dir
     
@@ -100,44 +100,44 @@ int worker_run(myftpserver_worker_t * worker_t) {
     bool user_login = false;
     while(!conn_close){
         char arg_buf[MAX_READ_BUF + 1] = {0};
-        FTPCMD cur_cmd = read_command(conn_handle, arg_buf);
-        server_log(SERVER_LOG_DEBUG, "Command %d from connection %d.\n", static_cast<int>(cur_cmd), conn_handle);;
+        FTPCMD cur_cmd = read_command(ctl_conn, arg_buf);
+        server_log(SERVER_LOG_DEBUG, "Command %d from connection %d.\n", static_cast<int>(cur_cmd), ctl_conn);;
 
         if (cur_cmd == FTPCMD::ERROR || cur_cmd == FTPCMD::QUIT){
-            send_reply(conn_handle, REPCODE_221, strlen(REPCODE_221));
+            send_msg(ctl_conn, REPCODE_221, strlen(REPCODE_221));
             conn_close = true;
             continue;
         }
         if (cur_cmd == FTPCMD::UNIMPL){
-            send_reply(conn_handle, REPCODE_502, strlen(REPCODE_502));
+            send_msg(ctl_conn, REPCODE_502, strlen(REPCODE_502));
             continue;
         }
         if (cur_cmd == FTPCMD::UNKNOWN){
-            send_reply(conn_handle, REPCODE_503, strlen(REPCODE_503));
+            send_msg(ctl_conn, REPCODE_503, strlen(REPCODE_503));
             continue;
         }
         if (!user_login){
             switch (cur_cmd){
                case FTPCMD::USER:
                     if (strlen(arg_buf) == 0){
-                        send_reply(conn_handle, REPCODE_501, strlen(REPCODE_501));
+                        send_msg(ctl_conn, REPCODE_501, strlen(REPCODE_501));
                         break;
                     }
                     if (strcmp(arg_buf, "anonymous") == 0){
                         // Not in RFC 959. Suggested by RFC 1635
                     }
                     strcpy(worker_t->username, arg_buf);
-                    send_reply(conn_handle, REPCODE_331, strlen(REPCODE_331));
+                    send_msg(ctl_conn, REPCODE_331, strlen(REPCODE_331));
                     break;
                 case FTPCMD::PASS:
                     // TODO: Add Password-check after adding config-read
                     if (strlen(worker_t->username) > 0){
                         user_login = true;
-                        send_reply(conn_handle, REPCODE_230, strlen(REPCODE_230));
+                        send_msg(ctl_conn, REPCODE_230, strlen(REPCODE_230));
                     }
                     break;
                 default:
-                    send_reply(conn_handle, REPCODE_530, strlen(REPCODE_530));
+                    send_msg(ctl_conn, REPCODE_530, strlen(REPCODE_530));
                     break;
             }
         }else{
@@ -146,29 +146,29 @@ int worker_run(myftpserver_worker_t * worker_t) {
                 case FTPCMD::CWD:
                     // TODO: Add change working dir command.
                     if (change_dir(worker_t, arg_buf) < 0){
-                        send_reply(conn_handle, REPCODE_550, strlen(REPCODE_550));
+                        send_msg(ctl_conn, REPCODE_550, strlen(REPCODE_550));
                     };
-                    server_log(SERVER_LOG_DEBUG, "Dir changed to %s for connection %d.\n", worker_t->reladir, conn_handle);
-                    send_reply(conn_handle, REPCODE_250, strlen(REPCODE_250));
+                    server_log(SERVER_LOG_DEBUG, "Dir changed to %s for connection %d.\n", worker_t->reladir, ctl_conn);
+                    send_msg(ctl_conn, REPCODE_250, strlen(REPCODE_250));
                     break;
                 case FTPCMD::CDUP:
                     if (change_dir(worker_t, "..") < 0){
-                        send_reply(conn_handle, REPCODE_550, strlen(REPCODE_550));
+                        send_msg(ctl_conn, REPCODE_550, strlen(REPCODE_550));
                     };
-                    server_log(SERVER_LOG_DEBUG, "Dir changed to %s for connection %d.\n", worker_t->reladir, conn_handle);
-                    send_reply(conn_handle, REPCODE_250, strlen(REPCODE_250));
+                    server_log(SERVER_LOG_DEBUG, "Dir changed to %s for connection %d.\n", worker_t->reladir, ctl_conn);
+                    send_msg(ctl_conn, REPCODE_250, strlen(REPCODE_250));
                     break;
                 case FTPCMD::PORT:
                     // TODO: RFC 959 minimum
                     if (get_data_conn_parm(arg_buf, &(worker_t->data_v4addr), &(worker_t->data_port)) < 0){
-                        send_reply(conn_handle, REPCODE_501, strlen(REPCODE_501));
+                        send_msg(ctl_conn, REPCODE_501, strlen(REPCODE_501));
                     }else{
-                        send_reply(conn_handle, REPCODE_200, strlen(REPCODE_200));
+                        send_msg(ctl_conn, REPCODE_200, strlen(REPCODE_200));
                     }
                     break;
                 case FTPCMD::TYPE:
                     // TODO: RFC 959 minimum
-                    send_reply(conn_handle, REPCODE_200, strlen(REPCODE_200));
+                    send_msg(ctl_conn, REPCODE_200, strlen(REPCODE_200));
                     break;
                 case FTPCMD::STRU:
                     // TODO: RFC 959 minimum
@@ -179,29 +179,29 @@ int worker_run(myftpserver_worker_t * worker_t) {
                         int set_mode_status = set_mode(worker_t, arg_buf);
                         switch (set_mode_status){
                             case 0:
-                                send_reply(conn_handle, REPCODE_200);
+                                send_msg(ctl_conn, REPCODE_200);
                                 break;
                             case -1:
-                                send_reply(conn_handle, REPCODE_501);
+                                send_msg(ctl_conn, REPCODE_501);
                                 break;
                             case -2:
                             default:
-                                send_reply(conn_handle, REPCODE_504);
+                                send_msg(ctl_conn, REPCODE_504);
                                 break;
                         }
                     }
                     break;
                 case FTPCMD::RETR:
-                    data_conn = open_data_connection(conn_handle, worker_t->data_v4addr, worker_t->data_port);
+                    data_conn = open_data_connection(ctl_conn, worker_t->data_v4addr, worker_t->data_port);
                     worker_t->data_conn = data_conn;
                     retrieve_file(worker_t, arg_buf);
-                    close_data_connection(conn_handle, data_conn);
+                    close_data_connection(ctl_conn, data_conn);
                     break;
                 case FTPCMD::STOR:
-                    data_conn = open_data_connection(conn_handle, worker_t->data_v4addr, worker_t->data_port);
+                    data_conn = open_data_connection(ctl_conn, worker_t->data_v4addr, worker_t->data_port);
                     worker_t->data_conn = data_conn;
                     store_file(worker_t, arg_buf);
-                    close_data_connection(conn_handle, data_conn);
+                    close_data_connection(ctl_conn, data_conn);
                     break;
                 case FTPCMD::PWD:
                     {
@@ -209,30 +209,30 @@ int worker_run(myftpserver_worker_t * worker_t) {
                         get_cur_path(worker_t, cur_dir);
                         //strcat(cur_dir, EOL);
                         char send_buf[MAX_PATH_LEN];
-                        prepare_reply(send_buf, REPCODE_257, cur_dir);
+                        prepare_msg(send_buf, REPCODE_257, cur_dir);
                         server_log(SERVER_LOG_DEBUG, "PWD reply: %s length: %zu \n", send_buf, strlen(send_buf));
-                        send_reply(conn_handle, send_buf);
+                        send_msg(ctl_conn, send_buf);
                         break;
                     }
                 case FTPCMD::LIST:
-                    data_conn = open_data_connection(conn_handle, worker_t->data_v4addr, worker_t->data_port);
+                    data_conn = open_data_connection(ctl_conn, worker_t->data_v4addr, worker_t->data_port);
                     worker_t->data_conn = data_conn;
                     list_dir(worker_t);
-                    close_data_connection(conn_handle, data_conn);
+                    close_data_connection(ctl_conn, data_conn);
                     break;
                 case FTPCMD::SIZE:
                     // TODO: Needed by Chrome ftp. What the hell... RFC 3659
                     {
                         char send_buf[32];
-                        prepare_reply(send_buf, REPCODE_213_SIZE, (long long)250);
-                        send_reply(conn_handle, send_buf);
+                        prepare_msg(send_buf, REPCODE_213_SIZE, (long long)250);
+                        send_msg(ctl_conn, send_buf);
                         break;
                     }
                 case FTPCMD::HELP:
-                    send_help(conn_handle);
+                    send_help(ctl_conn);
                     break;
                 case FTPCMD::NOOP:
-                    send_reply(conn_handle, REPCODE_200);
+                    send_msg(ctl_conn, REPCODE_200);
                     break;
                 case FTPCMD::SYST:
                     // Sent by FTP built-in Linux
@@ -240,12 +240,12 @@ int worker_run(myftpserver_worker_t * worker_t) {
                         char buf[10];
                         get_system_str(buf);
                         char send_buf[100];
-                        prepare_reply(send_buf, REPCODE_215, buf);
-                        send_reply(conn_handle, send_buf);
+                        prepare_msg(send_buf, REPCODE_215, buf);
+                        send_msg(ctl_conn, send_buf);
                         break;
                     }
                 default:
-                    send_reply(conn_handle, REPCODE_502, strlen(REPCODE_502));
+                    send_msg(ctl_conn, REPCODE_502, strlen(REPCODE_502));
                     break;
             }
         }

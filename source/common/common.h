@@ -32,6 +32,20 @@
  * C++ STL header
  * C++ 11 is needed
  */
+enum class FTPCMD{
+    // Access Control Commands
+    USER, PASS, ACCT, CWD, CDUP, SMNT, REIN, QUIT,
+    // Transfer Paramater Commands
+    PORT, PASV, TYPE, STRU, MODE,
+    // FTP Service Commands
+    RETR, STOR, STOU, APPE, ALLO, REST, RNFR, RNTO,
+    ABOR, DELE, RMD, MKD, PWD, LIST, NLST, SITE,
+    SYST, STAT, HELP, NOOP,
+    // Commands not in RFC 959
+    SIZE,
+    // Unknown Commands
+    UNKNOWN, ERROR, UNIMPL
+};
 
 /*
  * Common constants
@@ -42,6 +56,17 @@
 
 #define MAX_USER_NAME       32
 #define MAX_USER_PASS       32
+
+/*
+ * Common Utils
+ */
+FTPCMD read_command(int ctl_conn, char * arg_buf); 
+FTPCMD parse_command(const char * read_buf, char * arg_buf);
+int split_arg(const char * cmd_buf, char * arg_bug);
+
+#define prepare_msg(send_buf, reply_fmt, ...) sprintf(send_buf, reply_fmt, __VA_ARGS__)
+int send_msg(int ctl_conn, const char * send_buf);
+int send_msg(int ctl_conn, const char * send_buf, int len);
 
 /*
  * Log Definition

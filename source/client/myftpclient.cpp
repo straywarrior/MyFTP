@@ -51,30 +51,30 @@ static int start_client(myftpclient_t * client_t){
         int data_conn;
         switch (cur_cmd) {
             case FTPCMD::USER:
-                send_reply(client_sock, cmd_buf.c_str());
+                send_msg(client_sock, cmd_buf.c_str());
                 recv_and_show_reply(client_sock);
                 break;
             case FTPCMD::PASS:
-                send_reply(client_sock, cmd_buf.c_str());
+                send_msg(client_sock, cmd_buf.c_str());
                 recv_and_show_reply(client_sock);
                 break;
             case FTPCMD::PWD:
-                send_reply(client_sock, cmd_buf.c_str());
+                send_msg(client_sock, cmd_buf.c_str());
                 recv_and_show_reply(client_sock);
                 break;
             case FTPCMD::CWD:
-                send_reply(client_sock, cmd_buf.c_str());
+                send_msg(client_sock, cmd_buf.c_str());
                 recv_and_show_reply(client_sock);
                 break;
             case FTPCMD::CDUP:
-                send_reply(client_sock, cmd_buf.c_str());
+                send_msg(client_sock, cmd_buf.c_str());
                 recv_and_show_reply(client_sock);
                 break;
             case FTPCMD::LIST:
                 {
                     struct sockaddr_in data_sock_addr;
                     data_conn = open_and_send_data_port(client_sock, &data_sock_addr, client_t->local_ipv4addr);
-                    send_reply(client_sock, cmd_buf.c_str());
+                    send_msg(client_sock, cmd_buf.c_str());
                     recv_and_show_reply(client_sock);
                     recv_and_show_data(data_conn, &data_sock_addr);
                     recv_and_show_reply(client_sock);
@@ -82,18 +82,18 @@ static int start_client(myftpclient_t * client_t){
                 }
                 break;
             case FTPCMD::PORT:
-                send_reply(client_sock, cmd_buf.c_str());
+                send_msg(client_sock, cmd_buf.c_str());
                 recv_and_show_reply(client_sock);
                 break;
             case FTPCMD::PASV:
-                send_reply(client_sock, cmd_buf.c_str());
+                send_msg(client_sock, cmd_buf.c_str());
                 recv_and_show_reply(client_sock);
                 break;
             case FTPCMD::STOR:
                 {
                     struct sockaddr_in data_sock_addr;
                     data_conn = open_and_send_data_port(client_sock, &data_sock_addr, client_t->local_ipv4addr);
-                    send_reply(client_sock, cmd_buf.c_str());
+                    send_msg(client_sock, cmd_buf.c_str());
                     store_file(client_sock, data_conn, &data_sock_addr, arg_buf);
                     close_data_connection(client_sock, data_conn);
                     recv_and_show_reply(client_sock);
@@ -103,14 +103,16 @@ static int start_client(myftpclient_t * client_t){
                 {
                     struct sockaddr_in data_sock_addr;
                     data_conn = open_and_send_data_port(client_sock, &data_sock_addr, client_t->local_ipv4addr);
-                    send_reply(client_sock, cmd_buf.c_str());
+                    send_msg(client_sock, cmd_buf.c_str());
                     retrieve_file(client_sock, data_conn, &data_sock_addr, arg_buf);
                     close_data_connection(client_sock, data_conn);
                     recv_and_show_reply(client_sock);
                 }
                 break;
             case FTPCMD::HELP:
-                send_reply(client_sock, cmd_buf.c_str());
+            case FTPCMD::SYST:
+                send_msg(client_sock, cmd_buf.c_str());
+                recv_and_show_reply(client_sock);
                 break;
             case FTPCMD::QUIT:
                 close(client_sock);

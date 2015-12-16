@@ -42,11 +42,14 @@
  */
 #define DEFAULT_IPV4_ADDR   INADDR_ANY    // Selected IP by System
 #define DEFAULT_PORT        21
+#define DEFAULT_DATA_PORT   20
 #define RETRY_TIME          1             // Retry after 1 minutes.
 #define EOL                 "\r\n"
 
 #define MAX_PATH_LEN        256           // Max length of working path
 #define MAX_READ_BUF        1024
+#define MAX_SEND_BUF        512
+
 #define MAX_USER_NAME       32
 #define MAX_USER_PASS       32
 

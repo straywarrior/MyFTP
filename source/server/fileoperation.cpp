@@ -5,6 +5,8 @@
  * @Email:      i@straywarrior.com
  * Copyright (C) 2015 StrayWarrior
  *
+ * The functions here can be used in Linux/OS X only.
+ * Windows support may be added or not...
  */
 
 #include "fileoperation.h"
@@ -12,6 +14,10 @@
 #include <string>
 #include <vector>
 
+/*
+ * Simplify the path such as //root/dir/../temp/.//
+ * Inspired by LeetCode Problem "Simplify Path"
+ */
 static void clean_path(char * path){
     std::string path_str = std::string(path);
     std::vector<std::string> dir_vec;
@@ -57,12 +63,9 @@ static DIR * open_dir(const char * path){
     return dir;
 }
 
-static int get_fileinfo(const char * cur_dir, const char * filename, char * fileinfo){
-    struct stat stat_buf;
-    const int date_bufsize = 32;
-    char name_buf[MAX_PATH_LEN];
-    sprintf(name_buf, "%s/%s", cur_dir, filename);
-    if (stat(name_buf, &stat_buf) != 0){
+static int get_filestat(const char * filename, struct stat * stat_buf){
+    // filename is absolute name.
+    if (stat(filename, stat_buf) != 0){
         int err = errno;
         switch (err){
             case EACCES:
@@ -96,6 +99,16 @@ static int get_fileinfo(const char * cur_dir, const char * filename, char * file
                 server_log(SERVER_LOG_ERROR, "Invalid flag specified in flags.\n");
                 break;
         }
+        return -1;
+    }
+}
+
+static int get_fileinfo(const char * cur_dir, const char * filename, char * fileinfo){
+    struct stat stat_buf;
+    const int date_bufsize = 32;
+    char name_buf[MAX_PATH_LEN];
+    sprintf(name_buf, "%s/%s", cur_dir, filename);
+    if (get_filestat(name_buf, &stat_buf) != 0){
         server_log(SERVER_LOG_ERROR, "Failed to get file information: %s\n", filename);
         return -1;
     }else{
@@ -116,6 +129,21 @@ static int get_fileinfo(const char * cur_dir, const char * filename, char * file
     }
 }
 
+int get_cur_path(myftpserver_worker_t * worker_t, char * result){
+    result[0] = '\0';
+    strcat(result, worker_t->reladir);
+    clean_path(result);
+    return 0;
+}
+
+int get_absolute_path(myftpserver_worker_t * worker_t, char * result){
+    result[0] = '\0';
+    strcat(result, worker_t->rootdir);
+    strcat(result, worker_t->reladir);
+    clean_path(result);
+    return 0;
+}
+
 int change_dir(myftpserver_worker_t * worker_t, const char * pathname){
     char dir_buf[MAX_PATH_LEN];
     sprintf(dir_buf, "%s/%s", worker_t->reladir, pathname);
@@ -132,19 +160,7 @@ int change_dir(myftpserver_worker_t * worker_t, const char * pathname){
     closedir(dir);
     return 0;
 }
-int get_cur_path(myftpserver_worker_t * worker_t, char * result){
-    result[0] = '\0';
-    strcat(result, worker_t->reladir);
-    clean_path(result);
-    return 0;
-}
-int get_absolute_path(myftpserver_worker_t * worker_t, char * result){
-    result[0] = '\0';
-    strcat(result, worker_t->rootdir);
-    strcat(result, worker_t->reladir);
-    clean_path(result);
-    return 0;
-}
+
 int list_dir(myftpserver_worker_t * worker_t){
     int data_conn = worker_t->data_conn;
 
@@ -175,3 +191,54 @@ int list_dir(myftpserver_worker_t * worker_t){
     return 0;
 }
 
+int retrieve_file(myftpserver_worker_t * worker_t, const char * filename){
+    // TODO: Mode? Type? Structure?
+    char fread_buf[MAX_SEND_BUF];
+    int ctl_conn = worker_t->connection;
+    int data_conn = worker_t->data_conn;
+
+    if (data_conn > 0){
+        send_reply(ctl_conn, REPCODE_150);
+    }else{
+        send_reply(ctl_conn, REPCODE_425);
+        return -1;
+    }
+
+    // Check the file
+    char name_buf[MAX_PATH_LEN];
+    struct stat stat_buf;
+
+    // FIXME: How can I know whether the filename is absolute or relative?
+    get_absolute_path(worker_t, name_buf);
+    strcat(name_buf, "/");
+    strcat(name_buf, filename);
+
+    if (get_filestat(name_buf, &stat_buf) != 0){
+        server_log(SERVER_LOG_ERROR, "Failed to get file information: %s\n", filename);
+        return -1;
+    }
+
+    int frd_handle = open(name_buf, O_RDONLY);
+    if (frd_handle < 0){
+        server_log(SERVER_LOG_ERROR, "Cannot open file %s\n", name_buf);
+        send_reply(ctl_conn, REPCODE_451);
+        return -1;
+    }
+
+    // Sending the file.
+    // FIXME: STREAM or other MODE?
+    while (true){
+        int len = read(frd_handle, fread_buf, MAX_SEND_BUF);
+        if (len > 0){
+            send_reply(data_conn, fread_buf, len);
+        }else{
+            break;
+        }
+    }
+
+    return 0;
+}
+
+int store_file(myftpserver_worker_t * worker_t, const char * filename){
+    return 0;
+}

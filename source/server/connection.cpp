@@ -67,6 +67,9 @@ FTPCMD parse_command(char * read_buf, char * arg_buf){
         if (strncasecmp(read_buf, "PASS", 4) == 0){
             return FTPCMD::PASS;
         }
+        if (strncasecmp(read_buf, "CDUP", 4) == 0){
+            return FTPCMD::CDUP;
+        }
         if (strncasecmp(read_buf, "QUIT", 4) == 0){
             return FTPCMD::QUIT;
         }
@@ -75,7 +78,7 @@ FTPCMD parse_command(char * read_buf, char * arg_buf){
         }
         if (strncasecmp(read_buf, "PASV", 4) == 0){
             // FIXME: Needed by Safari/Chrome
-            return FTPCMD::UNIMPL;
+            return FTPCMD::PASV;
         }
         if (strncasecmp(read_buf, "TYPE", 4) == 0){
             return FTPCMD::TYPE;
@@ -140,6 +143,10 @@ int send_reply(int connection, const char * send_buf, int len){
     }
 }
 
+int send_reply(int connection, const char * send_buf){
+    return send_reply(connection, send_buf, strlen(send_buf));
+}
+
 int send_help(int connection){
     char command_impled[] =
         "USER PASS PWD SYST QUIT";
@@ -178,5 +185,6 @@ int open_data_connection(int connection, unsigned int v4addr, unsigned int port)
 int close_data_connection(int connection, int data_conn){
     close(data_conn);
     send_reply(connection, REPCODE_226, strlen(REPCODE_226));
+    server_log(SERVER_LOG_DEBUG, "Data connection for connection %d closed.\n", connection);
     return 0;
 }

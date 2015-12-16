@@ -32,8 +32,8 @@
  * The config structure
  */
 typedef struct myftpserver_t{
-    unsigned int port;
-    unsigned int ipv4addr;
+    unsigned int port;      // In host sequence
+    unsigned int ipv4addr;  // In network sequence
     unsigned int max_conns;
     //TODO: add ipv6 support?
     bool allow_anonymous;

@@ -210,6 +210,7 @@ int worker_run(myftpserver_worker_t * worker_t) {
                         //strcat(cur_dir, EOL);
                         char send_buf[MAX_PATH_LEN];
                         prepare_reply(send_buf, REPCODE_257, cur_dir);
+                        server_log(SERVER_LOG_DEBUG, "PWD reply: %s length: %zu \n", send_buf, strlen(send_buf));
                         send_reply(conn_handle, send_buf);
                         break;
                     }

@@ -13,6 +13,7 @@ set(SERVER_SRC_LIST server/${SERVER_NAME}.cpp
                     server/connection.cpp
                     server/fileoperation.cpp
                     common/OptionParser.cpp
+                    common/common.cpp
                     )
 
 add_executable(${SERVER_NAME} ${SERVER_SRC_LIST})
@@ -23,6 +24,7 @@ set(CLIENT_NAME ${PROJECT_NAME}client)
 set(CLIENT_SRC_LIST client/${CLIENT_NAME}.cpp
                     client/connection.cpp
                     common/OptionParser.cpp
+                    common/common.cpp
                     )
 
 add_executable(${CLIENT_NAME} ${CLIENT_SRC_LIST})
